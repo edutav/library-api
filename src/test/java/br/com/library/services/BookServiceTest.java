@@ -97,7 +97,6 @@ public class BookServiceTest {
 		assertThat(foundBook.get().getAuthor()).isEqualTo(book.getAuthor());
 		assertThat(foundBook.get().getIsbn()).isEqualTo(book.getIsbn());
 		assertThat(foundBook.get().getTitle()).isEqualTo(book.getTitle());
-
 	}
 
 	@Test
@@ -112,6 +111,68 @@ public class BookServiceTest {
 
 		//verificações
 		assertThat(book.isPresent()).isFalse();
+	}
+
+	@Test
+	@DisplayName("Deve deletar um livro.")
+	public void deleteBookTest() {
+		//cenário
+		Book book = Book.builder().id(1L).build();
+
+		//execução
+		org.junit.jupiter.api.Assertions.assertDoesNotThrow(() -> bookService.delete(book));
+
+		//verificação
+		Mockito.verify(repository, Mockito.times(1)).delete(book);
+	}
+
+	@Test
+	@DisplayName("Deve ocorrer erro ao tentar deletar um livro inexistente.")
+	public void deleteInvalidBookTest() {
+		//cenário
+		Book book = new Book();
+
+		//execução
+		org.junit.jupiter.api.Assertions.assertThrows(IllegalArgumentException.class, () -> bookService.delete(book));
+
+		//verificação
+		Mockito.verify(repository, Mockito.never()).delete(book);
+	}
+
+	@Test
+	@DisplayName("Deve ocorrer erro ao tentar atualizar um livro inexistente.")
+	public void updateInvalidBookTest() {
+		//cenário
+		Book book = new Book();
+
+		//execução
+		org.junit.jupiter.api.Assertions.assertThrows(IllegalArgumentException.class, () -> bookService.update(book));
+
+		//verificação
+		Mockito.verify(repository, Mockito.never()).save(book);
+	}
+
+	@Test
+	@DisplayName("Deve atualizar um livro.")
+	public void updateBookTest() {
+		//cenário
+		long id = 1;
+
+		Book updatingBook = Book.builder().id(id).build();
+
+		Book updatedBook = createValidBook();
+		updatedBook.setId(id);
+
+		Mockito.when(repository.save(updatingBook)).thenReturn(updatedBook);
+
+		//execução
+		Book book = bookService.update(updatingBook);
+
+		//verificação
+		assertThat(book.getId()).isEqualTo(updatedBook.getId());
+		assertThat(book.getTitle()).isEqualTo(updatedBook.getTitle());
+		assertThat(book.getIsbn()).isEqualTo(updatedBook.getIsbn());
+		assertThat(book.getAuthor()).isEqualTo(updatedBook.getAuthor());
 	}
 
 }
