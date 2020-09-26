@@ -9,7 +9,7 @@ import java.util.List;
 
 public class ApiErrors {
 
-	private List<String> errors;
+	private final List<String> errors;
 
 	public ApiErrors(BindingResult bindResult) {
 		this.errors = new ArrayList<>();
